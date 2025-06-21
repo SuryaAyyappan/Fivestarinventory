@@ -95,5 +95,40 @@ Preferred communication style: Simple, everyday language.
 
 ## Changelog
 
-Changelog:
-- June 21, 2025. Initial setup
+## Recent Changes
+
+- **June 21, 2025**: Complete restructure to separate backend and frontend
+  - Created Spring Boot backend with MySQL database (username: root, password: 12345678)
+  - Built React frontend with chocolate-themed UI and 3D animations
+  - Implemented all core features: Products, Inventory, Suppliers, Invoices, Reports, Alerts
+  - Added CSV import/export functionality
+  - Integrated Three.js particle system and Framer Motion animations
+  - Created comprehensive UI component library with Radix UI
+
+## Project Architecture Update
+
+### New Structure
+```
+├── backend/          # Spring Boot + MySQL
+│   ├── src/main/java/com/emart/inventory/
+│   ├── pom.xml
+│   └── application.properties
+├── frontend/         # React + TypeScript + Vite
+│   ├── src/
+│   ├── package.json
+│   └── vite.config.ts
+```
+
+### Backend Features
+- Complete Spring Boot REST API
+- MySQL database with comprehensive schema
+- JWT authentication ready
+- CSV import/export functionality
+- Advanced repository patterns
+
+### Frontend Features
+- Chocolate and gold themed UI
+- 3D particle background with Three.js
+- Smooth animations with Framer Motion
+- Comprehensive dashboard with charts
+- Responsive design with Tailwind CSS
