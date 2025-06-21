@@ -1,0 +1,110 @@
+# eMart Inventory Management System
+
+A comprehensive inventory management system for eMart Grocery Shop with advanced features including PDF generation, barcode generation, alerts, and maker-checker workflow.
+
+## 🚀 Features
+
+### Core Features
+- *User Authentication & Authorization* - Role-based access control (Admin, Maker, Checker)
+- *Product Management* - Complete CRUD operations with categories
+- *Inventory Tracking* - Separate warehouse and shelf inventory management
+- *Supplier Management* - Supplier information and relationship tracking
+- *Invoice Management* - Supplier invoice generation and tracking
+- *Barcode Generation* - Multiple barcode formats (Code128, EAN13, QR Code)
+- *PDF Generation* - Invoice, catalog, and report generation
+- *Alert System* - Low stock, expiry, and overdue invoice alerts
+- *Email Notifications* - Automated email alerts and notifications
+- *File Upload* - CSV import for bulk data processing
+- *Maker-Checker Workflow* - Approval workflow for inventory changes
+- *Audit Logging* - Complete audit trail of all operations
+
+### Advanced Features
+- *Indian Rupee Support* - Complete INR currency integration
+- *Real-time Alerts* - Scheduled alert checking and notifications
+- *Inventory Analytics* - Stock levels, value calculations, and reports
+- *Multi-location Support* - Warehouse and shelf inventory separation
+- *Expiry Management* - Product expiry tracking and warnings
+- *Damaged Goods Tracking* - Separate tracking for damaged inventory
+- *Reserved Stock Management* - Stock reservation for orders
+- *Threshold Management* - Configurable stock thresholds
+- *Bulk Operations* - Batch processing for multiple products
+- *Search & Filter* - Advanced search and filtering capabilities
+
+## 🛠 Tech Stack
+
+### Backend
+- *Spring Boot 3.2* - Main framework
+- *Java 24* - Programming language
+- *MySQL 8.0* - Database
+- *Spring Data JPA* - Data access layer
+- *Spring Security* - Authentication and authorization
+- *JWT* - Token-based authentication
+- *iText 7* - PDF generation
+- *ZXing* - Barcode generation
+- *Apache Kafka* - Message queuing (for future use)
+- *Swagger/OpenAPI* - API documentation
+
+### Frontend (Planned)
+- *React 18* - Frontend framework
+- *TypeScript* - Type safety
+- *Tailwind CSS* - Styling
+- *Redux Toolkit* - State management
+- *React Router* - Navigation
+
+### DevOps
+- *Docker* - Containerization
+- *Kubernetes* - Orchestration (for future use)
+- *Maven* - Build tool
+
+## 📁 Project Structure
+
+
+backend/
+├── src/main/java/com/emart/inventory/
+│   ├── InventoryManagementApplication.java
+│   ├── controller/
+│   │   ├── ProductController.java
+│   │   ├── InventoryController.java
+│   │   ├── SupplierController.java
+│   │   ├── InvoiceController.java
+│   │   ├── AlertController.java
+│   │   └── TestController.java
+│   ├── service/
+│   │   ├── ProductService.java
+│   │   ├── InventoryService.java
+│   │   ├── SupplierService.java
+│   │   ├── InvoiceService.java
+│   │   ├── AlertService.java
+│   │   ├── PdfService.java
+│   │   ├── BarcodeService.java
+│   │   └── EmailService.java
+│   ├── repository/
+│   │   ├── ProductRepository.java
+│   │   ├── InventoryRepository.java
+│   │   ├── SupplierRepository.java
+│   │   ├── InvoiceRepository.java
+│   │   ├── AlertRepository.java
+│   │   └── UserRepository.java
+│   ├── model/
+│   │   ├── Product.java
+│   │   ├── Inventory.java
+│   │   ├── Supplier.java
+│   │   ├── Invoice.java
+│   │   ├── Alert.java
+│   │   └── User.java
+│   └── config/
+│       ├── SecurityConfig.java
+│       └── JpaConfig.java
+├── src/main/resources/
+│   ├── application-dev.yml
+│   └── db/migration/
+└── pom.xml
+
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Java 24 or higher
+- MySQL 8.0
+- Maven 3.6+
+- IntelliJ IDEA (recommended)
