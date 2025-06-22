@@ -1,0 +1,43 @@
+Tne CuStomer eMart is into Grocerv business bv running chain of stores across the NA Region, and does 
+quite a lot of retail and bulk sales in a given day, The Customer is facing challenge in terms of managing 
+the inventory its gets on the daily or regular basis. 
+2. Inventory Management for a EMart Grocery Shop 
+On one side, the products arrives from the distributors or direct sellers into the customer ware house, 
+and on the other side, the same product is being stacked in the shelf for the people to buy. 
+The challenge the customer faces is 
+At any point of time what is the stock available in the inventory(ie in warehouse), and available 
+in the shelf 
+The edible stocks that does not move too fast, are tend of get spoiled too frequently. The system 
+should give warning 2-3 days in advance when that situation arises. 
+To categorize & identify the damaged goods, 
+Whether during transport 
+o During shopping 
+Or by expiry dates 
+Invoices to the suppliers to be managed for every stocks that moves in, and reverse invoices for 
+the goods that mnoves out. 
+Alert should be made to the administrator, when some stocks go below the threshold. 
+Build an online web application that handles following functionalities 
+1. 
+Login to the application using secure credentials 
+User able to enter or upload data pertaining to incoming inventories. 
+3. 
+Rules and Category management, so that the system generates needed alerts. Ex if goods is 
+reaching low in inventory or getting damaged etc 
+4. 
+On Daily/Regular basis, when goods moves from warehouse to the shop, the system has to 
+update the inventory details accordingly. 
+5. 
+Bar Code Generation-the stickers that will be pasted on the items 
+6. 
+Invoice Management 
+Additional Requirements : 
+1. There will be a maker-checker role within the shop, where inventory uploaded/entered by a 
+maker, would be verified by the checker 
+2. 
+Once 2pproved by checker, the data should not get tampered with. 
+3. The details about the incoming inventories might come as file feed to the system. (refer to 
+sample file format) 
+4. Invoice would be generated as PDF files (signed) and sent through email to the corresponding 
+distributors or seller. 
+5. 
+Alerts to be sent as Email as part of phase 1, and in phase 2 we will add SMS to it.
