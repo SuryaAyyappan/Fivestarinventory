@@ -87,9 +87,9 @@ mysql -u root -p
 **Create Database:**
 ```sql
 -- Login to MySQL and run:
-CREATE DATABASE emart_inventory;
+CREATE DATABASE fivestar;
 CREATE USER 'root'@'localhost' IDENTIFIED BY '12345678';
-GRANT ALL PRIVILEGES ON emart_inventory.* TO 'root'@'localhost';
+GRANT ALL PRIVILEGES ON fivestar.* TO 'root'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
 ```
@@ -114,7 +114,7 @@ mvn clean install
 ```properties
 # Already configured in src/main/resources/application.properties
 server.port=8080
-spring.datasource.url=jdbc:mysql://localhost:3306/emart_inventory?createDatabaseIfNotExist=true
+spring.datasource.url=jdbc:mysql://localhost:3306/fivestar?createDatabaseIfNotExist=true
 spring.datasource.username=root
 spring.datasource.password=12345678
 spring.jpa.hibernate.ddl-auto=update
@@ -304,7 +304,7 @@ mysql -u root -p
 # Enter password: 12345678
 
 # Use the database
-USE emart_inventory;
+USE fivestar;
 
 # View all tables
 SHOW TABLES;
@@ -339,7 +339,7 @@ LEFT JOIN suppliers s ON p.supplier_id = s.id;
    - Port: 3306
    - Username: root
    - Password: 12345678
-3. **Navigate to Schema:** emart_inventory
+3. **Navigate to Schema:** fivestar
 4. **Browse Tables:** products, categories, suppliers, inventory, etc.
 
 ### Using phpMyAdmin (Web Interface)
@@ -353,7 +353,7 @@ LEFT JOIN suppliers s ON p.supplier_id = s.id;
    ```
 2. **Access:** http://localhost:8081
 3. **Login:** root / 12345678
-4. **Select Database:** emart_inventory
+4. **Select Database:** fivestar
 
 ## 🎨 UI Theme and Design
 

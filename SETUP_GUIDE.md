@@ -79,14 +79,14 @@ mysql -u root -p
 
 ```sql
 -- Create database
-CREATE DATABASE emart_inventory CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE fivestar CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Create user (if needed)
 CREATE USER 'emart_user'@'localhost' IDENTIFIED BY '12345678';
 
 -- Grant privileges
-GRANT ALL PRIVILEGES ON emart_inventory.* TO 'root'@'localhost';
-GRANT ALL PRIVILEGES ON emart_inventory.* TO 'emart_user'@'localhost';
+GRANT ALL PRIVILEGES ON fivestar.* TO 'root'@'localhost';
+GRANT ALL PRIVILEGES ON fivestar.* TO 'emart_user'@'localhost';
 
 -- Flush privileges
 FLUSH PRIVILEGES;
@@ -111,7 +111,7 @@ cd /path/to/your/project/backend
 server.port=8080
 server.servlet.context-path=/api
 
-spring.datasource.url=jdbc:mysql://localhost:3306/emart_inventory?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+spring.datasource.url=jdbc:mysql://localhost:3306/fivestar?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
 spring.datasource.username=root
 spring.datasource.password=12345678
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
@@ -228,7 +228,7 @@ curl http://localhost:3000
 mysql -u root -p
 
 -- Use the database
-USE emart_inventory;
+USE fivestar;
 
 -- Insert sample categories
 INSERT INTO categories (name, description, created_at, updated_at) VALUES

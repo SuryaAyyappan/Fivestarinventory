@@ -18,6 +18,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import AddProduct from './add-product';
 
 // Mock data
 const products = [
@@ -86,6 +87,7 @@ const products = [
 export default function Products() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [showAddProduct, setShowAddProduct] = useState(false);
 
   const { data: productData } = useQuery({
     queryKey: ['/api/products', { search: searchTerm, category: selectedCategory }],
@@ -108,6 +110,10 @@ export default function Products() {
         return <Badge className="bg-green-500/20 text-green-500 border-green-500/30">In Stock</Badge>;
     }
   };
+
+  if (showAddProduct) {
+    return <AddProduct onBack={() => setShowAddProduct(false)} />;
+  }
 
   return (
     <div className="space-y-8">
@@ -133,7 +139,10 @@ export default function Products() {
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
-          <Button className="btn-3d bg-primary hover:bg-primary/90">
+          <Button 
+            className="btn-3d bg-primary hover:bg-primary/90"
+            onClick={() => setShowAddProduct(true)}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Add Product
           </Button>
