@@ -40,6 +40,20 @@ public class ProductService {
         }
     }
 
+    public Page<Product> searchProductsAll(String search, Long categoryId, Pageable pageable) {
+        if (search != null && !search.trim().isEmpty() && categoryId != null) {
+            return productRepository.findByNameContainingIgnoreCaseAndCategoryId(
+                search.trim(), categoryId, pageable);
+        } else if (search != null && !search.trim().isEmpty()) {
+            return productRepository.findByNameContainingIgnoreCase(
+                search.trim(), pageable);
+        } else if (categoryId != null) {
+            return productRepository.findByCategoryId(categoryId, pageable);
+        } else {
+            return productRepository.findAll(pageable);
+        }
+    }
+
     public Optional<Product> getProductById(Long id) {
         return productRepository.findById(id).filter(Product::getIsActive);
     }
@@ -64,13 +78,12 @@ public class ProductService {
                     product.setSupplier(productDetails.getSupplier());
                     product.setUnit(productDetails.getUnit());
                     product.setPurchasePrice(productDetails.getPurchasePrice());
-                    product.setSellingPrice(productDetails.getSellingPrice());
                     product.setMrp(productDetails.getMrp());
-                    product.setGstRate(productDetails.getGstRate());
-                    product.setHsnCode(productDetails.getHsnCode());
                     product.setMinStockLevel(productDetails.getMinStockLevel());
                     product.setMaxStockLevel(productDetails.getMaxStockLevel());
                     product.setExpiryDate(productDetails.getExpiryDate());
+                    product.setManufacturerDate(productDetails.getManufacturerDate());
+                    product.setManufacturerCode(productDetails.getManufacturerCode());
                     product.setBatchNumber(productDetails.getBatchNumber());
                     return productRepository.save(product);
                 })
@@ -97,5 +110,9 @@ public class ProductService {
 
     public long getTotalProductsCount() {
         return productRepository.countByIsActiveTrue();
+    }
+
+    public Page<Product> findByStatus(Product.Status status, Pageable pageable) {
+        return productRepository.findByStatusAndIsActiveTrue(status, pageable);
     }
 }

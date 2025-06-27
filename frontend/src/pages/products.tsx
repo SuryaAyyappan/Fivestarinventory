@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Plus, 
   Search, 
@@ -15,83 +15,66 @@ import {
   Barcode,
   DollarSign
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Badge } from '../components/ui/badge';
 import AddProduct from './add-product';
-
-// Mock data
-const products = [
-  {
-    id: 1,
-    name: 'Premium Basmati Rice',
-    sku: 'RICE001',
-    category: 'Grains',
-    supplier: 'Farm Fresh Co.',
-    price: 450.00,
-    stock: 150,
-    minStock: 50,
-    status: 'In Stock',
-    image: '/api/placeholder/80/80'
-  },
-  {
-    id: 2,
-    name: 'Organic Honey',
-    sku: 'HON001',
-    category: 'Sweeteners',
-    supplier: 'Pure Naturals',
-    price: 320.00,
-    stock: 25,
-    minStock: 30,
-    status: 'Low Stock',
-    image: '/api/placeholder/80/80'
-  },
-  {
-    id: 3,
-    name: 'Fresh Milk 1L',
-    sku: 'MILK001',
-    category: 'Dairy',
-    supplier: 'Local Dairy',
-    price: 60.00,
-    stock: 200,
-    minStock: 100,
-    status: 'In Stock',
-    image: '/api/placeholder/80/80'
-  },
-  {
-    id: 4,
-    name: 'Whole Wheat Flour',
-    sku: 'FLOUR001',
-    category: 'Grains',
-    supplier: 'Grain Masters',
-    price: 45.00,
-    stock: 80,
-    minStock: 40,
-    status: 'In Stock',
-    image: '/api/placeholder/80/80'
-  },
-  {
-    id: 5,
-    name: 'Green Tea Bags',
-    sku: 'TEA001',
-    category: 'Beverages',
-    supplier: 'Tea Gardens',
-    price: 180.00,
-    stock: 5,
-    minStock: 20,
-    status: 'Critical',
-    image: '/api/placeholder/80/80'
-  },
-];
+import { apiRequest } from '../lib/queryClient';
+import { useToast } from '../hooks/use-toast';
+import RoleBasedView from '../components/RoleBasedView';
+import { useAuth } from '../context/AuthContext';
 
 export default function Products() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showAddProduct, setShowAddProduct] = useState(false);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const { role } = useAuth();
 
-  const { data: productData } = useQuery({
-    queryKey: ['/api/products', { search: searchTerm, category: selectedCategory }],
-    initialData: { products, total: products.length },
+  const { data: productData, isLoading, isError } = useQuery({
+    queryKey: ['/api/products', { search: searchTerm, category: selectedCategory, role }],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (searchTerm) params.append('search', searchTerm);
+      if (selectedCategory !== 'all') params.append('categoryId', selectedCategory);
+      const url = `/api/products?${params.toString()}`;
+      return apiRequest(url, { headers: role ? { role } : undefined });
+    },
+    initialData: { products: [], total: 0 },
+  });
+
+  const deleteProductMutation = useMutation({
+    mutationFn: (id: number) => apiRequest(`/api/products/${id}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      toast({ title: 'Deleted', description: 'Product deleted successfully' });
+      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+    },
+    onError: (error: Error) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  const approveProductMutation = useMutation({
+    mutationFn: (id: number) => apiRequest(`/api/products/${id}/approve`, { method: 'POST', headers: role ? { role } : undefined }),
+    onSuccess: () => {
+      toast({ title: 'Approved', description: 'Product approved successfully' });
+      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+    },
+    onError: (error: Error) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  const rejectProductMutation = useMutation({
+    mutationFn: (id: number) => apiRequest(`/api/products/${id}/reject`, { method: 'POST', headers: role ? { role } : undefined }),
+    onSuccess: () => {
+      toast({ title: 'Rejected', description: 'Product rejected' });
+      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+    },
+    onError: (error: Error) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    },
   });
 
   const getStockStatus = (stock: number, minStock: number) => {
@@ -113,6 +96,12 @@ export default function Products() {
 
   if (showAddProduct) {
     return <AddProduct onBack={() => setShowAddProduct(false)} />;
+  }
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) {
+    console.error('Error loading products:', productData);
+    return <div>Error loading products.</div>;
   }
 
   return (
@@ -139,6 +128,7 @@ export default function Products() {
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
+          <RoleBasedView allowedRoles={['MAKER']}>
           <Button 
             className="btn-3d bg-primary hover:bg-primary/90"
             onClick={() => setShowAddProduct(true)}
@@ -146,6 +136,7 @@ export default function Products() {
             <Plus className="h-4 w-4 mr-2" />
             Add Product
           </Button>
+          </RoleBasedView>
         </div>
       </motion.div>
 
@@ -245,7 +236,7 @@ export default function Products() {
               </tr>
             </thead>
             <tbody>
-              {productData?.products.map((product, index) => (
+              {productData?.products.map((product: any, index: number) => (
                 <motion.tr
                   key={product.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -260,7 +251,7 @@ export default function Products() {
                       </div>
                       <div>
                         <div className="font-medium text-foreground">{product.name}</div>
-                        <div className="text-sm text-muted-foreground">{product.supplier}</div>
+                        <div className="text-sm text-muted-foreground">{product.supplier?.name || ''}</div>
                       </div>
                     </div>
                   </td>
@@ -270,35 +261,38 @@ export default function Products() {
                     </span>
                   </td>
                   <td className="p-4">
-                    <Badge variant="secondary">{product.category}</Badge>
+                    <Badge variant="secondary">{product.category?.name || ''}</Badge>
                   </td>
                   <td className="p-4">
                     <div className="text-sm">
                       <div className="font-medium text-foreground">{product.stock} units</div>
-                      <div className="text-muted-foreground">Min: {product.minStock}</div>
+                      <div className="text-muted-foreground">Min: {product.minStockLevel}</div>
                     </div>
                   </td>
                   <td className="p-4">
-                    <div className="font-medium text-foreground">₹{product.price.toFixed(2)}</div>
+                    <div className="font-medium text-foreground">₹{product.sellingPrice?.toFixed(2)}</div>
                   </td>
                   <td className="p-4">
-                    {getStockBadge(getStockStatus(product.stock, product.minStock))}
+                    {getStockBadge(getStockStatus(product.stock, product.minStockLevel))}
                   </td>
                   <td className="p-4">
-                    <div className="flex items-center justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-500 hover:text-red-600">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    {product.status || 'APPROVED'}
+                  </td>
+                  <td className="p-4">
+                    <Button variant="destructive" size="sm" onClick={() => deleteProductMutation.mutate(product.id)}>
+                      <Trash2 className="h-4 w-4" /> Delete
+                    </Button>
+                    {/* Approval actions for CHECKER on PENDING products */}
+                    {role === 'CHECKER' && (product.status === 'PENDING' || !product.status) && (
+                      <>
+                        <Button variant="default" size="sm" onClick={() => approveProductMutation.mutate(product.id)} style={{ marginLeft: 8 }}>
+                          Approve
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => rejectProductMutation.mutate(product.id)} style={{ marginLeft: 8 }}>
+                          Reject
+                        </Button>
+                      </>
+                    )}
                   </td>
                 </motion.tr>
               ))}

@@ -53,23 +53,13 @@ public class Product {
 
     @DecimalMin(value = "0.00")
     @Column(precision = 10, scale = 2)
-    private BigDecimal sellingPrice = BigDecimal.ZERO;
-
-    @DecimalMin(value = "0.00")
-    @Column(precision = 10, scale = 2)
     private BigDecimal mrp = BigDecimal.ZERO;
-
-    @DecimalMin(value = "0.00")
-    @Column(precision = 5, scale = 2)
-    private BigDecimal gstRate = BigDecimal.ZERO;
-
-    @Size(max = 10)
-    private String hsnCode;
 
     private Integer minStockLevel = 0;
     private Integer maxStockLevel = 1000;
 
-    private LocalDateTime expiryDate;
+    private java.time.LocalDateTime expiryDate;
+    private java.time.LocalDateTime manufacturerDate;
 
     @Size(max = 50)
     private String batchNumber;
@@ -77,7 +67,7 @@ public class Product {
     private Boolean isActive = true;
 
     @CreatedDate
-    private LocalDateTime createdAt;
+    private java.time.LocalDateTime createdAt;
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
@@ -94,14 +84,17 @@ public class Product {
     @JsonIgnore
     private List<StockMovement> stockMovements;
 
+    public enum Status {
+        PENDING, APPROVED, REJECTED
+    }
+
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.PENDING;
+
+    private String manufacturerCode; // 5 digits
+
     // Constructors
     public Product() {}
-
-    public Product(String name, String sku, BigDecimal sellingPrice) {
-        this.name = name;
-        this.sku = sku;
-        this.sellingPrice = sellingPrice;
-    }
 
     // Getters and Setters
     public Long getId() { return id; }
@@ -131,17 +124,8 @@ public class Product {
     public BigDecimal getPurchasePrice() { return purchasePrice; }
     public void setPurchasePrice(BigDecimal purchasePrice) { this.purchasePrice = purchasePrice; }
 
-    public BigDecimal getSellingPrice() { return sellingPrice; }
-    public void setSellingPrice(BigDecimal sellingPrice) { this.sellingPrice = sellingPrice; }
-
     public BigDecimal getMrp() { return mrp; }
     public void setMrp(BigDecimal mrp) { this.mrp = mrp; }
-
-    public BigDecimal getGstRate() { return gstRate; }
-    public void setGstRate(BigDecimal gstRate) { this.gstRate = gstRate; }
-
-    public String getHsnCode() { return hsnCode; }
-    public void setHsnCode(String hsnCode) { this.hsnCode = hsnCode; }
 
     public Integer getMinStockLevel() { return minStockLevel; }
     public void setMinStockLevel(Integer minStockLevel) { this.minStockLevel = minStockLevel; }
@@ -149,8 +133,11 @@ public class Product {
     public Integer getMaxStockLevel() { return maxStockLevel; }
     public void setMaxStockLevel(Integer maxStockLevel) { this.maxStockLevel = maxStockLevel; }
 
-    public LocalDateTime getExpiryDate() { return expiryDate; }
-    public void setExpiryDate(LocalDateTime expiryDate) { this.expiryDate = expiryDate; }
+    public java.time.LocalDateTime getExpiryDate() { return expiryDate; }
+    public void setExpiryDate(java.time.LocalDateTime expiryDate) { this.expiryDate = expiryDate; }
+
+    public java.time.LocalDateTime getManufacturerDate() { return manufacturerDate; }
+    public void setManufacturerDate(java.time.LocalDateTime manufacturerDate) { this.manufacturerDate = manufacturerDate; }
 
     public String getBatchNumber() { return batchNumber; }
     public void setBatchNumber(String batchNumber) { this.batchNumber = batchNumber; }
@@ -158,8 +145,8 @@ public class Product {
     public Boolean getIsActive() { return isActive; }
     public void setIsActive(Boolean isActive) { this.isActive = isActive; }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public java.time.LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(java.time.LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
@@ -172,4 +159,10 @@ public class Product {
 
     public List<StockMovement> getStockMovements() { return stockMovements; }
     public void setStockMovements(List<StockMovement> stockMovements) { this.stockMovements = stockMovements; }
+
+    public Status getStatus() { return status; }
+    public void setStatus(Status status) { this.status = status; }
+
+    public String getManufacturerCode() { return manufacturerCode; }
+    public void setManufacturerCode(String manufacturerCode) { this.manufacturerCode = manufacturerCode; }
 }

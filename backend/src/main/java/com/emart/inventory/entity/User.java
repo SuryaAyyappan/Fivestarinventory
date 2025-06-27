@@ -40,7 +40,7 @@ public class User {
     private String lastName;
 
     @Enumerated(EnumType.STRING)
-    private Role role = Role.STAFF;
+    private Role role = Role.MAKER;
 
     private Boolean isActive = true;
 
@@ -51,7 +51,7 @@ public class User {
     private LocalDateTime updatedAt;
 
     public enum Role {
-        ADMIN, MANAGER, STAFF
+        ADMIN, MAKER, CHECKER, USER
     }
 
     // Constructors

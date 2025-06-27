@@ -34,4 +34,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findExpiringProducts(@Param("days") int days);
     
     long countByIsActiveTrue();
+
+    Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
+    Page<Product> findByCategoryId(Long categoryId, Pageable pageable);
+    Page<Product> findByNameContainingIgnoreCaseAndCategoryId(String name, Long categoryId, Pageable pageable);
+
+    Page<Product> findByStatusAndIsActiveTrue(Product.Status status, Pageable pageable);
 }

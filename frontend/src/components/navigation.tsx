@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -10,6 +11,7 @@ import {
   Bell,
   Store,
   Sparkles,
+  Barcode as BarcodeIcon,
 } from 'lucide-react';
 
 const navItems = [
@@ -54,6 +56,12 @@ const navItems = [
     href: '/alerts',
     icon: Bell,
     description: 'Notifications',
+  },
+  {
+    name: 'Barcode Generator',
+    href: '/barcode',
+    icon: BarcodeIcon,
+    description: 'Generate & Download Barcodes',
   },
 ];
 

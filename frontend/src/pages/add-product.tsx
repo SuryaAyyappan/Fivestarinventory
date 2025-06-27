@@ -1,13 +1,15 @@
+import React from 'react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Save } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { useToast } from '../hooks/use-toast';
+import { apiRequest } from '../lib/queryClient';
+import { useAuth } from '../context/AuthContext';
 
 interface ProductForm {
   name: string;
@@ -17,26 +19,29 @@ interface ProductForm {
   supplierId: number;
   unit: string;
   purchasePrice: number;
-  sellingPrice: number;
   mrp: number;
-  gstRate: number;
-  hsnCode: string;
   minStockLevel: number;
   maxStockLevel: number;
+  expiryDate: string;
+  manufacturerDate: string;
+  manufacturerCode: string;
 }
 
 export default function AddProduct({ onBack }: { onBack: () => void }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<ProductForm>();
+  const { role } = useAuth();
 
   const { data: categories } = useQuery({
     queryKey: ['/api/categories'],
+    queryFn: () => apiRequest('/api/categories'),
     initialData: [],
   });
 
   const { data: suppliers } = useQuery({
     queryKey: ['/api/suppliers'],
+    queryFn: () => apiRequest('/api/suppliers'),
     initialData: [],
   });
 
@@ -44,6 +49,7 @@ export default function AddProduct({ onBack }: { onBack: () => void }) {
     mutationFn: (data: ProductForm) => apiRequest('/api/products', {
       method: 'POST',
       body: JSON.stringify(data),
+      headers: role ? { role: role } : {},
     }),
     onSuccess: () => {
       toast({
@@ -160,15 +166,6 @@ export default function AddProduct({ onBack }: { onBack: () => void }) {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">HSN Code</label>
-              <Input
-                {...register('hsnCode')}
-                placeholder="Enter HSN code"
-                className="focus-gold"
-              />
-            </div>
-
-            <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">Purchase Price *</label>
               <Input
                 type="number"
@@ -181,34 +178,11 @@ export default function AddProduct({ onBack }: { onBack: () => void }) {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Selling Price *</label>
-              <Input
-                type="number"
-                step="0.01"
-                {...register('sellingPrice', { required: 'Selling price is required', valueAsNumber: true })}
-                placeholder="0.00"
-                className="focus-gold"
-              />
-              {errors.sellingPrice && <p className="text-sm text-red-500">{errors.sellingPrice.message}</p>}
-            </div>
-
-            <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">MRP</label>
               <Input
                 type="number"
                 step="0.01"
                 {...register('mrp', { valueAsNumber: true })}
-                placeholder="0.00"
-                className="focus-gold"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">GST Rate (%)</label>
-              <Input
-                type="number"
-                step="0.01"
-                {...register('gstRate', { valueAsNumber: true })}
                 placeholder="0.00"
                 className="focus-gold"
               />
@@ -234,6 +208,41 @@ export default function AddProduct({ onBack }: { onBack: () => void }) {
                 className="focus-gold"
               />
               {errors.maxStockLevel && <p className="text-sm text-red-500">{errors.maxStockLevel.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Expiry Date *</label>
+              <Input
+                type="date"
+                {...register('expiryDate', { required: 'Expiry date is required' })}
+                className="focus-gold"
+              />
+              {errors.expiryDate && <p className="text-sm text-red-500">{errors.expiryDate.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Manufacturer Date *</label>
+              <Input
+                type="date"
+                {...register('manufacturerDate', { required: 'Manufacturer date is required' })}
+                className="focus-gold"
+              />
+              {errors.manufacturerDate && <p className="text-sm text-red-500">{errors.manufacturerDate.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Manufacturer Code *</label>
+              <Input
+                type="text"
+                {...register('manufacturerCode', {
+                  required: 'Manufacturer code is required',
+                  pattern: { value: /^\d{5}$/, message: 'Must be 5 digits' }
+                })}
+                className="focus-gold"
+                maxLength={5}
+                placeholder="e.g. 12345"
+              />
+              {errors.manufacturerCode && <p className="text-sm text-red-500">{errors.manufacturerCode.message}</p>}
             </div>
           </div>
 

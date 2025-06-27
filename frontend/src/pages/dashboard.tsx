@@ -1,5 +1,5 @@
+import React from 'react';
 import { motion } from 'framer-motion';
-import { useQuery } from '@tanstack/react-query';
 import { 
   Package, 
   TrendingUp, 
@@ -10,53 +10,29 @@ import {
   BarChart3,
   Eye
 } from 'lucide-react';
-import StatsCard from '@/components/stats-card';
+import StatsCard from '../components/stats-card';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-
-// Mock data for demo
-const dashboardStats = {
-  totalProducts: 1248,
-  totalSuppliers: 89,
-  totalStockValue: 2456789,
-  lowStockAlerts: 23,
-  totalRevenue: 3456789,
-  monthlyGrowth: 12.5,
-};
-
-const salesData = [
-  { month: 'Jan', sales: 420000, orders: 145 },
-  { month: 'Feb', sales: 380000, orders: 132 },
-  { month: 'Mar', sales: 520000, orders: 178 },
-  { month: 'Apr', sales: 610000, orders: 203 },
-  { month: 'May', sales: 580000, orders: 189 },
-  { month: 'Jun', sales: 720000, orders: 234 },
-];
-
-const topProducts = [
-  { name: 'Premium Basmati Rice', sales: 45230, growth: 15.2 },
-  { name: 'Organic Honey', sales: 32100, growth: 8.7 },
-  { name: 'Fresh Milk 1L', sales: 28950, growth: 12.1 },
-  { name: 'Whole Wheat Flour', sales: 25840, growth: 6.3 },
-  { name: 'Green Tea Bags', sales: 22170, growth: 18.9 },
-];
-
-const lowStockItems = [
-  { name: 'Olive Oil 500ml', stock: 5, minStock: 20, status: 'critical' },
-  { name: 'Almonds 250g', stock: 12, minStock: 25, status: 'warning' },
-  { name: 'Dark Chocolate', stock: 8, minStock: 15, status: 'warning' },
-  { name: 'Coconut Oil 1L', stock: 3, minStock: 10, status: 'critical' },
-];
+import { useQuery } from '@tanstack/react-query';
+import { apiRequest } from '../lib/queryClient';
 
 export default function Dashboard() {
-  const { data: stats } = useQuery({
+  const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['/api/dashboard/stats'],
-    initialData: dashboardStats,
+    queryFn: () => apiRequest('/api/dashboard/stats'),
+    initialData: {},
+  });
+  const { data: topProducts, isLoading: topLoading } = useQuery({
+    queryKey: ['/api/dashboard/top-selling'],
+    queryFn: () => apiRequest('/api/dashboard/top-selling'),
+    initialData: [],
+  });
+  const { data: lowStockItems, isLoading: lowLoading } = useQuery({
+    queryKey: ['/api/dashboard/low-stock'],
+    queryFn: () => apiRequest('/api/dashboard/low-stock'),
+    initialData: [],
   });
 
-  const { data: lowStock } = useQuery({
-    queryKey: ['/api/dashboard/low-stock'],
-    initialData: lowStockItems,
-  });
+  if (statsLoading || topLoading || lowLoading) return <div>Loading dashboard...</div>;
 
   return (
     <div className="space-y-8">
@@ -94,7 +70,7 @@ export default function Dashboard() {
       >
         <StatsCard
           title="Total Products"
-          value={stats?.totalProducts.toLocaleString() || '0'}
+          value={stats.totalProducts?.toLocaleString?.() ?? '0'}
           change="+12%"
           changeType="positive"
           icon={Package}
@@ -102,7 +78,7 @@ export default function Dashboard() {
         />
         <StatsCard
           title="Total Revenue"
-          value={`₹${(stats?.totalRevenue || 0).toLocaleString()}`}
+          value={`₹${stats.totalRevenue?.toLocaleString?.() ?? '0'}`}
           change="+8.2%"
           changeType="positive"
           icon={DollarSign}
@@ -110,7 +86,7 @@ export default function Dashboard() {
         />
         <StatsCard
           title="Active Suppliers"
-          value={stats?.totalSuppliers.toString() || '0'}
+          value={stats.totalSuppliers?.toString?.() ?? '0'}
           change="+5%"
           changeType="positive"
           icon={Users}
@@ -118,7 +94,7 @@ export default function Dashboard() {
         />
         <StatsCard
           title="Low Stock Alerts"
-          value={stats?.lowStockAlerts.toString() || '0'}
+          value={stats.lowStockAlerts?.toString?.() ?? '0'}
           change="-3%"
           changeType="negative"
           icon={AlertTriangle}
@@ -142,9 +118,8 @@ export default function Dashboard() {
             </div>
             <TrendingUp className="h-6 w-6 text-primary" />
           </div>
-          
           <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={salesData}>
+            <AreaChart data={[]}>
               <defs>
                 <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
@@ -187,9 +162,8 @@ export default function Dashboard() {
             </div>
             <ShoppingCart className="h-6 w-6 text-primary" />
           </div>
-          
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={salesData}>
+            <BarChart data={[]}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
               <YAxis stroke="hsl(var(--muted-foreground))" />
@@ -227,9 +201,8 @@ export default function Dashboard() {
             </div>
             <BarChart3 className="h-6 w-6 text-primary" />
           </div>
-
           <div className="space-y-4">
-            {topProducts.map((product, index) => (
+            {topProducts.map((product: any, index: number) => (
               <motion.div
                 key={product.name}
                 initial={{ opacity: 0, x: -20 }}
@@ -248,7 +221,7 @@ export default function Dashboard() {
                       {product.name}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      ₹{product.sales.toLocaleString()} sales
+                      ₹{product.sales?.toLocaleString?.() ?? '0'} sales
                     </div>
                   </div>
                 </div>
@@ -279,38 +252,20 @@ export default function Dashboard() {
             </div>
             <AlertTriangle className="h-6 w-6 text-red-500" />
           </div>
-
           <div className="space-y-4">
-            {lowStock?.map((item, index) => (
+            {lowStockItems.map((item: any, index: number) => (
               <motion.div
                 key={item.name}
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.6 + index * 0.1 }}
                 className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
               >
-                <div className="flex items-center space-x-3">
-                  <div className={`w-3 h-3 rounded-full ${
-                    item.status === 'critical' ? 'bg-red-500' : 'bg-yellow-500'
-                  } animate-pulse`} />
-                  <div>
                     <div className="font-medium text-foreground">{item.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      Min: {item.minStock} units
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className={`text-sm font-medium ${
-                    item.status === 'critical' ? 'text-red-500' : 'text-yellow-500'
-                  }`}>
-                    {item.stock} left
-                  </div>
-                  <button className="text-xs text-primary hover:text-primary/80 transition-colors">
-                    <Eye className="h-3 w-3 inline mr-1" />
-                    View
-                  </button>
-                </div>
+                <div className="text-sm text-muted-foreground">Stock: {item.stock} (Min: {item.minStock})</div>
+                <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${item.status === 'critical' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                  {item.status === 'critical' ? 'Critical' : 'Warning'}
+                </span>
               </motion.div>
             ))}
           </div>

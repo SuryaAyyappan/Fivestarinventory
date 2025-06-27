@@ -1,7 +1,22 @@
+import React from 'react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { BarChart3, PieChart, TrendingUp, Download } from 'lucide-react';
+import { apiRequest } from '../lib/queryClient';
 
 export default function Reports() {
+  // Placeholder: Replace '/api/reports' with your actual backend endpoint if available
+  const { data: reportData, isLoading, isError } = useQuery({
+    queryKey: ['/api/reports'],
+    queryFn: () => apiRequest('/api/reports'),
+    enabled: false, // Set to true if endpoint exists
+    initialData: [],
+  });
+
+  // If you have no backend yet, show a placeholder
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error loading reports.</div>;
+
   return (
     <div className="space-y-8">
       <motion.div

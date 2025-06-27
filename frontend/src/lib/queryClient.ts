@@ -18,17 +18,16 @@ export const queryClient = new QueryClient({
 });
 
 export async function apiRequest(url: string, options: RequestInit = {}) {
-  const response = await fetch(url, {
-    headers: {
+  const token = localStorage.getItem('token');
+  const headers = {
+    ...(options.headers || {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
       'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  });
-
+  };
+  const response = await fetch(url, { ...options, headers });
   if (!response.ok) {
-    throw new Error(`${response.status}: ${response.statusText}`);
+    const error = await response.text();
+    throw new Error(error || 'API error');
   }
-
   return response.json();
 }

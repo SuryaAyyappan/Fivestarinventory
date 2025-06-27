@@ -19,9 +19,9 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     
     List<Inventory> findByLocation(String location);
     
-    @Query("SELECT SUM(i.quantityInStock * p.sellingPrice) FROM Inventory i JOIN i.product p WHERE p.isActive = true")
-    BigDecimal getTotalStockValue();
-    
     @Query("SELECT COUNT(DISTINCT i.product.id) FROM Inventory i WHERE i.quantityInStock <= i.product.minStockLevel")
     long countLowStockProducts();
+
+    @Query("SELECT SUM(i.quantityInStock * p.purchasePrice) FROM Inventory i JOIN i.product p WHERE p.isActive = true")
+    BigDecimal getTotalStockValue();
 }
