@@ -6,6 +6,7 @@ interface AuthContextType {
   username: string | null;
   login: (token: string, role: string, username: string) => void;
   logout: () => void;
+  switchRole: (newRole: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,8 +40,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('username');
   };
 
+  const switchRole = (newRole: string) => {
+    const validRoles = ['ADMIN', 'MAKER', 'CHECKER'];
+    if (validRoles.includes(newRole.toUpperCase())) {
+      setRole(newRole.toUpperCase());
+      localStorage.setItem('role', newRole.toUpperCase());
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ token, role, username, login, logout }}>
+    <AuthContext.Provider value={{ token, role, username, login, logout, switchRole }}>
       {children}
     </AuthContext.Provider>
   );

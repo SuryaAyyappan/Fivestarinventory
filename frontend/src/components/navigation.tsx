@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -12,7 +12,10 @@ import {
   Store,
   Sparkles,
   Barcode as BarcodeIcon,
+  LogOut,
+  User,
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const navItems = [
   {
@@ -38,6 +41,12 @@ const navItems = [
     href: '/suppliers',
     icon: Users,
     description: 'Vendor Management',
+  },
+  {
+    name: 'Outlets',
+    href: '/outlets',
+    icon: Store,
+    description: 'Outlet Management',
   },
   {
     name: 'Invoices',
@@ -67,6 +76,13 @@ const navItems = [
 
 export default function Navigation() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout, username, role } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
 
   return (
     <div className="fixed left-0 top-0 h-full w-64 sidebar-gradient border-r border-primary/20 z-10">
@@ -90,7 +106,7 @@ export default function Navigation() {
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex-1 p-4">
+        <nav className="flex-1 p-4 overflow-y-auto min-h-0">
           <div className="space-y-2">
             {navItems.map((item, index) => {
               const Icon = item.icon;
@@ -160,26 +176,6 @@ export default function Navigation() {
             })}
           </div>
         </nav>
-
-        {/* Footer */}
-        <div className="p-4 border-t border-primary/20">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="text-center"
-          >
-            <div className="premium-card p-3 rounded-lg">
-              <div className="flex items-center justify-center space-x-2 mb-2">
-                <Sparkles className="h-4 w-4 text-primary animate-pulse" />
-                <span className="text-sm font-medium text-primary">Premium Edition</span>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Advanced Analytics & 3D Experience
-              </p>
-            </div>
-          </motion.div>
-        </div>
       </div>
     </div>
   );

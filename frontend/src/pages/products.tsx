@@ -13,12 +13,15 @@ import {
   Upload,
   Package,
   Barcode,
-  DollarSign
+  DollarSign,
+  Check,
+  X
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
 import AddProduct from './add-product';
+import { CSVImport } from '../components/csv-import';
 import { apiRequest } from '../lib/queryClient';
 import { useToast } from '../hooks/use-toast';
 import RoleBasedView from '../components/RoleBasedView';
@@ -28,9 +31,10 @@ export default function Products() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showAddProduct, setShowAddProduct] = useState(false);
+  const [showCSVImport, setShowCSVImport] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { role } = useAuth();
+  const { role, username } = useAuth();
 
   const { data: productData, isLoading, isError } = useQuery({
     queryKey: ['/api/products', { search: searchTerm, category: selectedCategory, role }],
@@ -98,6 +102,22 @@ export default function Products() {
     return <AddProduct onBack={() => setShowAddProduct(false)} />;
   }
 
+  if (showCSVImport) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-4xl font-bold gradient-text">
+            {role === 'MAKER' ? 'CSV Import' : role === 'ADMIN' ? 'CSV Management' : 'Pending CSV Reviews'}
+          </h1>
+          <Button variant="outline" onClick={() => setShowCSVImport(false)}>
+            Back to Products
+          </Button>
+        </div>
+        <CSVImport role={role || ''} username={username || ''} />
+      </div>
+    );
+  }
+
   if (isLoading) return <div>Loading...</div>;
   if (isError) {
     console.error('Error loading products:', productData);
@@ -120,15 +140,33 @@ export default function Products() {
         </div>
         
         <div className="flex items-center space-x-3">
-          <Button variant="outline" className="btn-3d">
-            <Upload className="h-4 w-4 mr-2" />
-            Import CSV
-          </Button>
+          <RoleBasedView allowedRoles={['MAKER', 'ADMIN']}>
+            <Button 
+              variant="outline" 
+              className="btn-3d"
+              onClick={() => setShowCSVImport(true)}
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Import CSV
+            </Button>
+          </RoleBasedView>
+          
+          <RoleBasedView allowedRoles={['CHECKER', 'ADMIN']}>
+            <Button 
+              variant="outline" 
+              className="btn-3d"
+              onClick={() => setShowCSVImport(true)}
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              Pending CSV
+            </Button>
+          </RoleBasedView>
+          
           <Button variant="outline" className="btn-3d">
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
-          <RoleBasedView allowedRoles={['MAKER']}>
+          <RoleBasedView allowedRoles={['MAKER', 'ADMIN']}>
           <Button 
             className="btn-3d bg-primary hover:bg-primary/90"
             onClick={() => setShowAddProduct(true)}
@@ -229,7 +267,7 @@ export default function Products() {
                 <th className="text-left p-4 font-semibold text-foreground">Product</th>
                 <th className="text-left p-4 font-semibold text-foreground">SKU</th>
                 <th className="text-left p-4 font-semibold text-foreground">Category</th>
-                <th className="text-left p-4 font-semibold text-foreground">Stock</th>
+                <th className="text-left p-4 font-semibold text-foreground">Quantity</th>
                 <th className="text-left p-4 font-semibold text-foreground">Price</th>
                 <th className="text-left p-4 font-semibold text-foreground">Status</th>
                 <th className="text-right p-4 font-semibold text-foreground">Actions</th>
@@ -251,7 +289,7 @@ export default function Products() {
                       </div>
                       <div>
                         <div className="font-medium text-foreground">{product.name}</div>
-                        <div className="text-sm text-muted-foreground">{product.supplier?.name || ''}</div>
+                        <div className="text-sm text-muted-foreground">{product.supplierName || ''}</div>
                       </div>
                     </div>
                   </td>
@@ -261,38 +299,40 @@ export default function Products() {
                     </span>
                   </td>
                   <td className="p-4">
-                    <Badge variant="secondary">{product.category?.name || ''}</Badge>
+                    <Badge variant="secondary">{product.categoryName || ''}</Badge>
                   </td>
                   <td className="p-4">
                     <div className="text-sm">
-                      <div className="font-medium text-foreground">{product.stock} units</div>
-                      <div className="text-muted-foreground">Min: {product.minStockLevel}</div>
+                      <div className="font-medium text-foreground">{product.stock || 0} quantity</div>
+                      <div className="text-muted-foreground">Min: {product.minStockLevel || 0}</div>
                     </div>
                   </td>
                   <td className="p-4">
-                    <div className="font-medium text-foreground">₹{product.sellingPrice?.toFixed(2)}</div>
+                    <div className="font-medium text-foreground">₹{product.purchasePrice?.toFixed(2) || '0.00'}</div>
                   </td>
                   <td className="p-4">
-                    {getStockBadge(getStockStatus(product.stock, product.minStockLevel))}
+                    <div className="flex flex-col space-y-1">
+                      {getStockBadge(getStockStatus(product.stock || 0, product.minStockLevel || 0))}
+                      <Badge variant="outline">{product.status || 'APPROVED'}</Badge>
+                    </div>
                   </td>
                   <td className="p-4">
-                    {product.status || 'APPROVED'}
-                  </td>
-                  <td className="p-4">
-                    <Button variant="destructive" size="sm" onClick={() => deleteProductMutation.mutate(product.id)}>
-                      <Trash2 className="h-4 w-4" /> Delete
-                    </Button>
-                    {/* Approval actions for CHECKER on PENDING products */}
-                    {role === 'CHECKER' && (product.status === 'PENDING' || !product.status) && (
-                      <>
-                        <Button variant="default" size="sm" onClick={() => approveProductMutation.mutate(product.id)} style={{ marginLeft: 8 }}>
-                          Approve
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => rejectProductMutation.mutate(product.id)} style={{ marginLeft: 8 }}>
-                          Reject
-                        </Button>
-                      </>
-                    )}
+                    <div className="flex items-center space-x-2 justify-end">
+                      <Button variant="destructive" size="sm" onClick={() => deleteProductMutation.mutate(product.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                      {/* Approval actions for CHECKER on PENDING products */}
+                      {role === 'CHECKER' && (product.status === 'PENDING' || !product.status) && (
+                        <>
+                          <Button variant="default" size="sm" onClick={() => approveProductMutation.mutate(product.id)}>
+                            <Check className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => rejectProductMutation.mutate(product.id)}>
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </td>
                 </motion.tr>
               ))}

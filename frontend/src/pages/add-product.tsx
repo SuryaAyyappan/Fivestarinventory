@@ -25,6 +25,7 @@ interface ProductForm {
   expiryDate: string;
   manufacturerDate: string;
   manufacturerCode: string;
+  quantity: number;
 }
 
 export default function AddProduct({ onBack }: { onBack: () => void }) {
@@ -243,6 +244,18 @@ export default function AddProduct({ onBack }: { onBack: () => void }) {
                 placeholder="e.g. 12345"
               />
               {errors.manufacturerCode && <p className="text-sm text-red-500">{errors.manufacturerCode.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Quantity *</label>
+              <Input
+                type="number"
+                min={0}
+                {...register('quantity', { required: 'Quantity is required', valueAsNumber: true })}
+                placeholder="0"
+                className="focus-gold"
+              />
+              {errors.quantity && <p className="text-sm text-red-500">{errors.quantity.message}</p>}
             </div>
           </div>
 

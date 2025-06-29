@@ -64,23 +64,12 @@ public class Supplier {
     @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Invoice> invoices;
-    private String SupplierCode;
-
-    public String getSupplierCode() {
-        return SupplierCode;
-    }
-
-    public void setSupplierCode(String supplierCode) {
-        SupplierCode = supplierCode;
-    }
 
     // Constructors
     public Supplier() {}
 
-    public Supplier(String SupplierCode,String name, String contactPerson, String email, String phone) {
-        this.SupplierCode = SupplierCode;
+    public Supplier(String name, String contactPerson, String email, String phone) {
         this.name = name;
-
         this.contactPerson = contactPerson;
         this.email = email;
         this.phone = phone;

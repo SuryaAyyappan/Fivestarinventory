@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.emart.inventory.repository.InventoryRepository;
+import com.emart.inventory.entity.Inventory;
+
 @RestController
 @RequestMapping("/api/products")
 @CrossOrigin(origins = "http://localhost:3000")
@@ -35,6 +38,9 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private InventoryRepository inventoryRepository;
 
     @GetMapping
     public ResponseEntity<Map<String, Object>> getAllProducts(
@@ -48,7 +54,12 @@ public class ProductController {
         Page<Product> productPage;
 
         if ("ADMIN".equalsIgnoreCase(role)) {
-            productPage = productService.findByStatus(Product.Status.APPROVED, pageable);
+            // ADMIN can see all products (approved, pending, rejected)
+            if (search != null && !search.trim().isEmpty() || categoryId != null) {
+                productPage = productService.searchProductsAll(search, categoryId, pageable);
+            } else {
+                productPage = productService.getAllProducts(pageable);
+            }
         } else if ("CHECKER".equalsIgnoreCase(role)) {
             productPage = productService.findByStatus(Product.Status.PENDING, pageable);
         } else if ("MAKER".equalsIgnoreCase(role)) {
@@ -87,9 +98,9 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<?> createProduct(@Valid @RequestBody Map<String, Object> productData, @RequestHeader("role") String role) {
         logger.info("Received request to create product: {} by role: {}", productData, role);
-        if (!"MAKER".equals(role)) {
-            logger.warn("Forbidden: Only MAKER can add products. Role provided: {}", role);
-            return ResponseEntity.status(403).body("Only MAKER can add products");
+        if (!"MAKER".equals(role) && !"ADMIN".equals(role)) {
+            logger.warn("Forbidden: Only MAKER and ADMIN can add products. Role provided: {}", role);
+            return ResponseEntity.status(403).body("Only MAKER and ADMIN can add products");
         }
         try {
             Product product = new Product();
@@ -118,9 +129,22 @@ public class ProductController {
             if (productData.get("manufacturerDate") != null) {
                 product.setManufacturerDate(java.time.LocalDateTime.parse((String) productData.get("manufacturerDate") + "T00:00:00"));
             }
-            product.setStatus(Product.Status.PENDING);
+            if (productData.get("quantity") != null) {
+                try {
+                    product.setQuantity(Integer.parseInt(productData.get("quantity").toString()));
+                } catch (Exception e) {
+                    logger.warn("Invalid quantity value: {}", productData.get("quantity"));
+                }
+            }
+            // ADMIN can directly approve products, MAKER creates pending
+            if ("ADMIN".equals(role)) {
+                product.setStatus(Product.Status.APPROVED);
+            } else {
+                product.setStatus(Product.Status.PENDING);
+            }
             Product savedProduct = productService.createProduct(product);
             logger.info("Product saved successfully: {}", savedProduct);
+
             return ResponseEntity.ok(savedProduct);
         } catch (Exception e) {
             logger.error("Error saving product: {}", e.getMessage(), e);
@@ -225,8 +249,8 @@ public class ProductController {
 
     @PostMapping("/{id}/approve")
     public ResponseEntity<?> approveProduct(@PathVariable Long id, @RequestHeader("role") String role) {
-        if (!"CHECKER".equalsIgnoreCase(role)) {
-            return ResponseEntity.status(403).body("Only CHECKER can approve products");
+        if (!"CHECKER".equalsIgnoreCase(role) && !"ADMIN".equalsIgnoreCase(role)) {
+            return ResponseEntity.status(403).body("Only CHECKER and ADMIN can approve products");
         }
         var productOpt = productService.getProductById(id);
         if (productOpt.isEmpty()) {
@@ -234,14 +258,14 @@ public class ProductController {
         }
         var product = productOpt.get();
         product.setStatus(Product.Status.APPROVED);
-        productService.createProduct(product); // Save the updated product
-        return ResponseEntity.ok(product);
+        Product updatedProduct = productService.updateProduct(id, product);
+        return ResponseEntity.ok(updatedProduct);
     }
 
     @PostMapping("/{id}/reject")
     public ResponseEntity<?> rejectProduct(@PathVariable Long id, @RequestHeader("role") String role) {
-        if (!"CHECKER".equalsIgnoreCase(role)) {
-            return ResponseEntity.status(403).body("Only CHECKER can reject products");
+        if (!"CHECKER".equalsIgnoreCase(role) && !"ADMIN".equalsIgnoreCase(role)) {
+            return ResponseEntity.status(403).body("Only CHECKER and ADMIN can reject products");
         }
         var productOpt = productService.getProductById(id);
         if (productOpt.isEmpty()) {
@@ -249,8 +273,8 @@ public class ProductController {
         }
         var product = productOpt.get();
         product.setStatus(Product.Status.REJECTED);
-        productService.createProduct(product); // Save the updated product
-        return ResponseEntity.ok(product);
+        Product updatedProduct = productService.updateProduct(id, product);
+        return ResponseEntity.ok(updatedProduct);
     }
 
     // DTO for safe serialization
@@ -270,6 +294,7 @@ public class ProductController {
         public String expiryDate;
         public String manufacturerDate;
         public String manufacturerCode;
+        public Integer stock;
 
         public ProductDTO(Product p) {
             this.id = p.getId();
@@ -287,6 +312,8 @@ public class ProductController {
             this.expiryDate = p.getExpiryDate() != null ? p.getExpiryDate().toString() : null;
             this.manufacturerDate = p.getManufacturerDate() != null ? p.getManufacturerDate().toString() : null;
             this.manufacturerCode = p.getManufacturerCode();
+            
+            this.stock = p.getQuantity();
         }
     }
 }

@@ -22,6 +22,10 @@ public class ProductService {
         return productRepository.findByIsActiveTrue();
     }
 
+    public Page<Product> getAllProducts(Pageable pageable) {
+        return productRepository.findByIsActiveTrue(pageable);
+    }
+
     public Page<Product> getProducts(Pageable pageable) {
         return productRepository.findByIsActiveTrue(pageable);
     }

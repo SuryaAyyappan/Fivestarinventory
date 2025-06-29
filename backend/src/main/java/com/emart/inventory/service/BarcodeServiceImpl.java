@@ -27,7 +27,7 @@ public class BarcodeServiceImpl implements BarcodeService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         String countryCode = "890"; // India
-        String manufacturerCode = product.getSupplier().getSupplierCode(); // e.g., supplier/distributor code
+        String manufacturerCode = product.getManufacturerCode(); // Use product's manufacturerCode
         String productCode = String.format("%05d", product.getId()); // Ensure 5 digits
 
         String baseBarcode = countryCode + manufacturerCode + productCode;

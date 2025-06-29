@@ -24,6 +24,10 @@ public class SupplierService {
         return supplierRepository.findById(id).filter(Supplier::getIsActive);
     }
 
+    public Optional<Supplier> findByName(String name) {
+        return supplierRepository.findByName(name);
+    }
+
     public Supplier createSupplier(Supplier supplier) {
         return supplierRepository.save(supplier);
     }

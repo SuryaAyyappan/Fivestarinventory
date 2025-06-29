@@ -38,10 +38,12 @@ public class Product {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
+    @JsonIgnore
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplier_id")
+    @JsonIgnore
     private Supplier supplier;
 
     @Size(max = 20)
@@ -72,7 +74,7 @@ public class Product {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Inventory> inventory;
 
@@ -92,6 +94,7 @@ public class Product {
     private Status status = Status.PENDING;
 
     private String manufacturerCode; // 5 digits
+    private Integer quantity = 0; // Direct stock tracking
 
     // Constructors
     public Product() {}
@@ -165,4 +168,7 @@ public class Product {
 
     public String getManufacturerCode() { return manufacturerCode; }
     public void setManufacturerCode(String manufacturerCode) { this.manufacturerCode = manufacturerCode; }
+
+    public Integer getQuantity() { return quantity; }
+    public void setQuantity(Integer quantity) { this.quantity = quantity; }
 }

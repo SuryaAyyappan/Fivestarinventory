@@ -31,13 +31,19 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<Category> createCategory(@Valid @RequestBody Category category) {
+    public ResponseEntity<Category> createCategory(@Valid @RequestBody Category category, @RequestHeader("role") String role) {
+        if (!"ADMIN".equals(role)) {
+            return ResponseEntity.status(403).body(null);
+        }
         Category savedCategory = categoryService.createCategory(category);
         return ResponseEntity.ok(savedCategory);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @Valid @RequestBody Category category) {
+    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @Valid @RequestBody Category category, @RequestHeader("role") String role) {
+        if (!"ADMIN".equals(role)) {
+            return ResponseEntity.status(403).body(null);
+        }
         try {
             Category updatedCategory = categoryService.updateCategory(id, category);
             return ResponseEntity.ok(updatedCategory);
@@ -47,7 +53,10 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id, @RequestHeader("role") String role) {
+        if (!"ADMIN".equals(role)) {
+            return ResponseEntity.status(403).build();
+        }
         try {
             categoryService.deleteCategory(id);
             return ResponseEntity.noContent().build();

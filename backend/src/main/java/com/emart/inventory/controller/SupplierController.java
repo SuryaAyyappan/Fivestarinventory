@@ -31,13 +31,19 @@ public class SupplierController {
     }
 
     @PostMapping
-    public ResponseEntity<Supplier> createSupplier(@Valid @RequestBody Supplier supplier) {
+    public ResponseEntity<Supplier> createSupplier(@Valid @RequestBody Supplier supplier, @RequestHeader("role") String role) {
+        if (!"ADMIN".equals(role)) {
+            return ResponseEntity.status(403).body(null);
+        }
         Supplier savedSupplier = supplierService.createSupplier(supplier);
         return ResponseEntity.ok(savedSupplier);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Supplier> updateSupplier(@PathVariable Long id, @Valid @RequestBody Supplier supplier) {
+    public ResponseEntity<Supplier> updateSupplier(@PathVariable Long id, @Valid @RequestBody Supplier supplier, @RequestHeader("role") String role) {
+        if (!"ADMIN".equals(role)) {
+            return ResponseEntity.status(403).body(null);
+        }
         try {
             Supplier updatedSupplier = supplierService.updateSupplier(id, supplier);
             return ResponseEntity.ok(updatedSupplier);
@@ -47,7 +53,10 @@ public class SupplierController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSupplier(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteSupplier(@PathVariable Long id, @RequestHeader("role") String role) {
+        if (!"ADMIN".equals(role)) {
+            return ResponseEntity.status(403).build();
+        }
         try {
             supplierService.deleteSupplier(id);
             return ResponseEntity.noContent().build();

@@ -1,16 +1,6 @@
-name,description,sku,category,supplier,unit,purchasePrice,sellingPrice,mrp,gstRate,hsnCode,minStockLevel,maxStockLevel
-Premium Basmati Rice,Long grain premium basmati rice,RICE001,Grains & Rice,Farm Fresh Co.,kg,400.00,450.00,500.00,5.00,1006,50,500
-Organic Honey,Pure organic honey from natural sources,HON001,Sweeteners,Pure Naturals,bottle,280.00,320.00,350.00,12.00,0409,30,200
-Fresh Milk 1L,Fresh full cream milk,MILK001,Dairy Products,Local Dairy,liter,50.00,60.00,65.00,5.00,0401,100,1000
-Whole Wheat Flour,Organic whole wheat flour,FLOUR001,Grains & Rice,Farm Fresh Co.,kg,35.00,45.00,50.00,5.00,1101,40,300
-Green Tea Bags,Premium green tea bags,TEA001,Beverages,Pure Naturals,box,150.00,180.00,200.00,18.00,0902,20,150
-Turmeric Powder,Pure turmeric powder,TUR001,Spices & Condiments,Spice Masters,packet,80.00,100.00,120.00,12.00,0910,25,200
-Fresh Bread,Daily fresh white bread,BREAD001,Bakery Items,Local Bakery,loaf,25.00,30.00,35.00,5.00,1905,50,200
-Olive Oil 500ml,Extra virgin olive oil,OIL001,Cooking Oils,Premium Oils Co.,bottle,450.00,520.00,580.00,12.00,1509,20,100
-Cashew Nuts 250g,Premium cashew nuts,CASH001,Dry Fruits,Nuts Paradise,packet,800.00,950.00,1050.00,12.00,0801,15,80
-Dark Chocolate 100g,Premium dark chocolate 70% cocoa,CHOC001,Confectionery,Sweet Delights,bar,180.00,220.00,250.00,18.00,1806,30,150
-Coconut Oil 1L,Pure coconut oil cold pressed,COCO001,Cooking Oils,Coconut Fresh,bottle,320.00,380.00,420.00,12.00,1513,25,120
-Fresh Paneer 200g,Fresh cottage cheese,PAN001,Dairy Products,Local Dairy,packet,80.00,100.00,120.00,5.00,0406,20,100
-Almonds 250g,Premium California almonds,ALM001,Dry Fruits,Nuts Paradise,packet,450.00,540.00,600.00,12.00,0802,20,80
-Tomato Sauce 500g,Rich tomato sauce,SAU001,Sauces & Condiments,Sauce King,bottle,65.00,80.00,95.00,18.00,2103,40,200
-Jasmine Rice 5kg,Fragrant jasmine rice,JRICE001,Grains & Rice,Farm Fresh Co.,kg,280.00,320.00,360.00,5.00,1006,30,150
+name,description,sku,barcode,categoryName,supplierName,unit,purchasePrice,mrp,minStockLevel,maxStockLevel,expiryDate,manufacturerDate,batchNumber,manufacturerCode
+Laptop Dell Inspiron 15,High-performance laptop for business and gaming,DELL001,8901234567890,Electronics,Dell India,pcs,45000.00,55000.00,5,50,2025-12-31,2024-01-15,BATCH001,12345
+iPhone 15 Pro,Latest smartphone with advanced features,APPLE001,8902345678901,Electronics,Apple India,pcs,75000.00,85000.00,10,100,2026-06-30,2024-02-01,BATCH002,23456
+Samsung 55" Smart TV,4K Ultra HD Smart Television,SAMSUNG001,8903456789012,Electronics,Samsung India,pcs,35000.00,45000.00,3,30,2025-08-15,2024-01-20,BATCH003,34567
+Nike Air Max Shoes,Comfortable running shoes,NIKE001,8904567890123,Sports,Nike India,pcs,2500.00,3500.00,20,200,2025-03-31,2024-01-10,BATCH004,45678
+Adidas T-Shirt,Cotton sports t-shirt,ADIDAS001,8905678901234,Sports,Adidas India,pcs,800.00,1200.00,50,500,2024-12-31,2024-01-05,BATCH005,56789

@@ -40,4 +40,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByNameContainingIgnoreCaseAndCategoryId(String name, Long categoryId, Pageable pageable);
 
     Page<Product> findByStatusAndIsActiveTrue(Product.Status status, Pageable pageable);
+
+    List<Product> findBySupplierIdAndIsActiveTrue(Long supplierId);
 }
